@@ -1,4 +1,4 @@
-import os, platform, sys, requests, threading
+import os, requests, threading
 from recnetlogin import login_to_recnet
 from time import sleep
 from typing import List, Dict
