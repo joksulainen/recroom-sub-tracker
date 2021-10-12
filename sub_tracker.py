@@ -1,7 +1,7 @@
 import os, platform, sys, requests, threading
 from recnetlogin import login_to_recnet
 from time import sleep
-from typing import List
+from typing import List, Dict
 
 class SubTracker:
     thread: threading.Thread
@@ -9,13 +9,14 @@ class SubTracker:
     account_id: int
     pfp: str
     update_frequency: float
-    webhooks: List[str]
+    webhooks: List[Dict[str, str]]
     old_subs: int
 
-    def __init__(self, token: str, account_id: int, update_frequency: float = 3):
+    def __init__(self, token: str, account_id: int, webhooks: List[Dict[str, str]], update_frequency: float = 3):
         self.account_id = account_id
         self.token = token
         self.update_frequency = update_frequency
+        self.webhooks = webhooks
         r = requests.get(f"https://accounts.rec.net/account/{self.account_id}")
         self.thread = threading.Thread(target=self.sub_tracker, name=r['username'])
         self.pfp = "https://img.rec.net/" + r["profileImage"]
