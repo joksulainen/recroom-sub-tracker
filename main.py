@@ -6,7 +6,7 @@ from typing import List
 
 def main():
     """Main script function."""
-    global token, account_id, old_subs, pfp
+    global token, account_id, old_subs, pfp, username
     old_subs = 0
 
     # Initial prints.
@@ -35,9 +35,28 @@ def main():
     if not login["success"]:
         sys.exit("Incorrect RR account credentials!")
     
-    pfp = "https://img.rec.net/" + login['account_data']['profileImage']
-    account_id = login['account_data']['accountId']
+    #account_id = login['account_data']['accountId']
+    #pfp = "https://img.rec.net/" + login['account_data']['profileImage']
     token = login['bearer_token']
+
+    #Select account to track
+    account_id = None
+    while not account_id:
+        username_input = input("Username of account to track subs of (Empty for using current login details): ")
+        if username_input == "":
+            account_id = login['account_data']['accountId']
+            pfp = "https://img.rec.net/" + login['account_data']['profileImage']
+            break
+        r = requests.get(f"https://accounts.rec.net/account?username={username_input}")
+        if not r.ok:
+            print("Account does not exist. Try again.")
+            continue
+        result = r.json()
+        account_id = result["accountId"]
+        username = username_input
+        pfp = "https://img.rec.net/" + result["profileImage"]
+
+
 
     old_subs = fetch_subscribers()['subs']
 
