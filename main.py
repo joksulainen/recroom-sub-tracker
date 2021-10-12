@@ -127,7 +127,6 @@ def sub_tracker(time: float, urls: List[str]):
                 if not r.ok:
                     print(f"POST request failed\n{url}")
             old_subs = subs
-            os.environ.set
         else:
             print("No sub change.")
         
