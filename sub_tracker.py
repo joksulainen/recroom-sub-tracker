@@ -20,32 +20,14 @@ class SubTracker:
         r = requests.get(f"https://accounts.rec.net/account/{self.account_id}")
         self.thread = threading.Thread(target=self.__sub_tracker, name=r['username'])
         self.pfp = "https://img.rec.net/" + r["profileImage"]
-        self.old_subs = self.fetch_subscribers()['subs']
-
-
-    def fetch_subscribers(self) -> Dict[str, bool] | Dict[str, Any]:
-        """Fetch subscriber count from the rec.net servers."""
-        # Send GET request to request sub count.
-        r = requests.get(
-            f"https://clubs.rec.net/subscription/subscriberCount/{self.account_id}",
-            headers={"Authorization": self.token}
-        )
-        # Return a failed fetch attempt.
-        if not r.ok:
-            return {"success": False}
-
-        subs = int(r.text)
-        print(f"[{self.thread.name}] Subscribers:", subs)
-
-        # Return success with sub count.
-        return {"success": True, "subs": subs}
+        self.old_subs = fetch_subscribers()['subs']
 
 
     def __sub_tracker(self) -> None:
         """Sub tracker loop."""
         while True:
             # Fetch sub count.
-            sub_fetch = self.fetch_subscribers()
+            sub_fetch = fetch_subscribers()
             # Login if the fetch attempt was unsuccessful.
             if not sub_fetch['success']:
                 login = login_to_recnet(os.environ["RR_USERNAME"], os.environ["RR_PASSWORD"])
@@ -105,3 +87,18 @@ class SubTracker:
         print(f"[{self.thread.name}] Terminating thread...")
         self.thread.join()
         print(f"[{self.thread.name}] Thread terminated")
+
+
+def fetch_subscribers(token: str, account_id: int) -> Dict[str, bool] | Dict[str, Any]:
+    """Fetch subscriber count from the rec.net servers."""
+    # Send GET request to request sub count.
+    r = requests.get(
+        f"https://clubs.rec.net/subscription/subscriberCount/{account_id}",
+        headers={"Authorization": token}
+    )
+    # Return a failed fetch attempt.
+    if not r.ok:
+        return {"success": False}
+
+    # Return success with sub count.
+    return {"success": True, "subs": int(r.text)}
