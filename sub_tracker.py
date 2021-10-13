@@ -10,7 +10,7 @@ class SubTracker:
     pfp: str
     update_frequency: float
     webhooks: List[Dict[str, str]]
-    old_subs: int
+    __old_subs: int
 
     def __init__(self, token: str, account_id: int, webhooks: List[Dict[str, str]], update_frequency: float = 3):
         self.account_id = account_id
@@ -20,7 +20,7 @@ class SubTracker:
         r = requests.get(f"https://accounts.rec.net/account/{self.account_id}")
         self.thread = threading.Thread(target=self.__sub_tracker, name=r['username'])
         self.pfp = "https://img.rec.net/" + r["profileImage"]
-        self.old_subs = fetch_subscribers()['subs']
+        self.__old_subs = fetch_subscribers()['subs']
 
 
     def __sub_tracker(self) -> None:
@@ -41,13 +41,13 @@ class SubTracker:
             subs = sub_fetch['subs']
 
             # Post embeds of sub increase or decrease if applicable.
-            if subs > self.old_subs:
-                print(f"[{self.thread.name}] Gained subs!", subs-self.old_subs)
+            if subs > self.__old_subs:
+                print(f"[{self.thread.name}] Gained subs!", subs-self.__old_subs)
                 payload = {
                     "embeds": [
                         {
                             "title": "Gained subscribers!",
-                            "description": f"{self.old_subs:,} (+{subs-self.old_subs})\n**Subscribers:** `{subs:,}`",
+                            "description": f"{self.__old_subs:,} (+{subs-self.__old_subs})\n**Subscribers:** `{subs:,}`",
                             "color": 0xE67E22,
                             "thumbnail": {"url": self.pfp},
                             "footer": {"text": f"Account: {self.thread.name}"}
@@ -58,14 +58,14 @@ class SubTracker:
                     r = requests.post(url, json=payload, timeout=3)
                     if not r.ok:
                         print(f"[{self.thread.name}] POST request failed\n{url}")
-                self.old_subs = subs
-            elif subs < self.old_subs:
-                print(f"[{self.thread.name}] Lost subs!", self.old_subs-subs)
+                self.__old_subs = subs
+            elif subs < self.__old_subs:
+                print(f"[{self.thread.name}] Lost subs!", self.__old_subs-subs)
                 payload = {
                     "embeds": [
                         {
                             "title": "Lost subscribers!",
-                            "description": f"{self.old_subs:,} (-{self.old_subs-subs})\n**Subscribers:** `{subs:,}`",
+                            "description": f"{self.__old_subs:,} (-{self.__old_subs-subs})\n**Subscribers:** `{subs:,}`",
                             "color": 0xE67E22,
                             "thumbnail": {"url": self.pfp},
                             "footer": {"text": f"Account: {self.thread.name}"}
@@ -76,17 +76,15 @@ class SubTracker:
                     r = requests.post(url, json=payload, timeout=3)
                     if not r.ok:
                         print(f"[{self.thread.name}] POST request failed\n{url}")
-                self.old_subs = subs
+                self.__old_subs = subs
             else:
                 print(f"[{self.thread.name}] No sub change.")
             
             # Wait the given time before checking again.
             sleep(self.update_frequency)
 
-        # Terminate thread if broken out of loop
-        print(f"[{self.thread.name}] Terminating thread...")
-        self.thread.join()
-        print(f"[{self.thread.name}] Thread terminated")
+        # Print if loop is broken out of
+        print(f"[{self.thread.name}] Loop broken out of")
 
 
 def fetch_subscribers(token: str, account_id: int) -> Dict[str, bool] | Dict[str, Any]:
