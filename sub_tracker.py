@@ -18,7 +18,7 @@ class SubTracker:
         self.update_frequency = update_frequency
         self.webhooks = webhooks
         r = requests.get(f"https://accounts.rec.net/account/{self.account_id}")
-        self.thread = threading.Thread(target=self.sub_tracker, name=r['username'])
+        self.thread = threading.Thread(target=self.__sub_tracker, name=r['username'])
         self.pfp = "https://img.rec.net/" + r["profileImage"]
         self.old_subs = self.fetch_subscribers()['subs']
 
@@ -41,7 +41,7 @@ class SubTracker:
         return {"success": True, "subs": subs}
 
 
-    def sub_tracker(self) -> None:
+    def __sub_tracker(self) -> None:
         """Sub tracker loop."""
         while True:
             # Fetch sub count.
