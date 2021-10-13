@@ -23,7 +23,7 @@ class SubTracker:
         self.old_subs = self.fetch_subscribers()['subs']
 
 
-    def fetch_subscribers(self) -> Dict[str, str] | Dict[str, Any]:
+    def fetch_subscribers(self) -> Dict[str, bool] | Dict[str, Any]:
         """Fetch subscriber count from the rec.net servers."""
         # Send GET request to request sub count.
         r = requests.get(
