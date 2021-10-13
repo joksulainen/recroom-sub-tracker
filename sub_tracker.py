@@ -20,14 +20,14 @@ class SubTracker:
         r = requests.get(f"https://accounts.rec.net/account/{self.account_id}")
         self.thread = threading.Thread(target=self.__sub_tracker, name=r['username'])
         self.pfp = "https://img.rec.net/" + r["profileImage"]
-        self.__old_subs = fetch_subscribers()['subs']
+        self.__old_subs = fetch_subscribers(self.token, self.account_id)['subs']
 
 
     def __sub_tracker(self) -> None:
         """Sub tracker loop."""
         while True:
             # Fetch sub count.
-            sub_fetch = fetch_subscribers()
+            sub_fetch = fetch_subscribers(self.token, self.account_id)
             # Login if the fetch attempt was unsuccessful.
             if not sub_fetch['success']:
                 login = login_to_recnet(os.environ["RR_USERNAME"], os.environ["RR_PASSWORD"])
