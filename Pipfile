@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 requests = "*"
 recnetlogin = {git = "https://github.com/Jegarde/RecNet-Login.git"}
+flask = "*"
 
 [dev-packages]
 
