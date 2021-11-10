@@ -9,7 +9,7 @@ class SubTracker:
     account_id: int
     pfp: str
     update_frequency: float
-    webhooks: List[Dict[str, str]]
+    webhooks: List[str]
     __old_subs: int
 
     def __init__(self, token: str, account_id: int, webhooks: List[str], update_frequency: float = 3) -> None:
