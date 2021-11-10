@@ -38,8 +38,7 @@ def main():
     while not account_id:
         username_input = input("Username of account to track subs of (Empty for using current login details): ")
         if username_input == "":
-            account_id = login['account_data']['accountId']
-            pfp = "https://img.rec.net/" + login['account_data']['profileImage']
+            account_id = login.data["accountId"]
             break
         r = requests.get(f"https://accounts.rec.net/account?username={username_input}")
         if not r.ok:
@@ -47,8 +46,6 @@ def main():
             continue
         result = r.json()
         account_id = result["accountId"]
-        username = username_input
-        pfp = "https://img.rec.net/" + result["profileImage"]
 
     # Get webhooks from environment variable.
     webhooks = os.environ['RR_WEBHOOKS'].split(";")
