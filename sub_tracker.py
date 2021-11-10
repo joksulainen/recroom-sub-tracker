@@ -18,8 +18,8 @@ class SubTracker:
         self.update_frequency = update_frequency
         self.webhooks = webhooks
         r = requests.get(f"https://accounts.rec.net/account/{self.account_id}")
-        self.thread = threading.Thread(target=self.__sub_tracker, name=r['username'])
-        self.pfp = "https://img.rec.net/" + r["profileImage"]
+        self.thread = threading.Thread(target=self.__sub_tracker, name=r.json()['username'])
+        self.pfp = "https://img.rec.net/" + r.json()["profileImage"]
         self.__old_subs = fetch_subscribers(self.token, self.account_id)['subs']
 
 
@@ -53,7 +53,7 @@ class SubTracker:
             if subs > self.__old_subs:
                 print(f"[{self.thread.name}] Gained subs!", subs-self.__old_subs)
                 payload["embeds"][0]["title"] = "Gained subscribers!"
-                payload["embeds"][0]["description"] = f"{self.__old_subs:,} (+{subs-self.__old_subs})\n**Subscribers:** `{subs:,}`"
+                payload["embeds"][0]["description"] = f"{self.__old_subs:,} (+{(subs-self.__old_subs):,})\n**Subscribers:** `{subs:,}`"
                 for url in self.webhooks:
                     r = requests.post(url, json=payload, timeout=3)
                     if not r.ok:
@@ -62,7 +62,7 @@ class SubTracker:
             elif subs < self.__old_subs:
                 print(f"[{self.thread.name}] Lost subs!", self.__old_subs-subs)
                 payload["embeds"][0]["title"] = "Lost subscribers!"
-                payload["embeds"][0]["description"] = f"{self.__old_subs:,} (-{self.__old_subs-subs})\n**Subscribers:** `{subs:,}`"
+                payload["embeds"][0]["description"] = f"{self.__old_subs:,} (-{(self.__old_subs-subs):,})\n**Subscribers:** `{subs:,}`"
                 for url in self.webhooks:
                     r = requests.post(url, json=payload, timeout=3)
                     if not r.ok:
