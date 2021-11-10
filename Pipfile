@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 requests = "*"
-recnetlogin = {git = "https://github.com/Jegarde/RecNet-Login.git"}
+recnetlogin = {ref = "aeeb7091c16f121190a30585f3690b67c5c003e3", git = "https://github.com/Jegarde/RecNet-Login.git"}
 flask = "*"
 
 [dev-packages]
