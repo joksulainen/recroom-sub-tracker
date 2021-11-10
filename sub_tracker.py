@@ -41,19 +41,19 @@ class SubTracker:
             subs = sub_fetch['subs']
 
             # Post embeds of sub increase or decrease if applicable.
+            payload = {
+                "embeds": [
+                    {
+                        "color": 0xE67E22,
+                        "thumbnail": {"url": self.pfp},
+                        "footer": {"text": f"Account: {self.thread.name}"}
+                    }
+                ]
+            }
             if subs > self.__old_subs:
                 print(f"[{self.thread.name}] Gained subs!", subs-self.__old_subs)
-                payload = {
-                    "embeds": [
-                        {
-                            "title": "Gained subscribers!",
-                            "description": f"{self.__old_subs:,} (+{subs-self.__old_subs})\n**Subscribers:** `{subs:,}`",
-                            "color": 0xE67E22,
-                            "thumbnail": {"url": self.pfp},
-                            "footer": {"text": f"Account: {self.thread.name}"}
-                        }
-                    ]
-                }
+                payload["embeds"][0]["title"] = "Gained subscribers!"
+                payload["embeds"][0]["description"] = f"{self.__old_subs:,} (+{subs-self.__old_subs})\n**Subscribers:** `{subs:,}`"
                 for url in self.webhooks:
                     r = requests.post(url, json=payload, timeout=3)
                     if not r.ok:
@@ -61,17 +61,8 @@ class SubTracker:
                 self.__old_subs = subs
             elif subs < self.__old_subs:
                 print(f"[{self.thread.name}] Lost subs!", self.__old_subs-subs)
-                payload = {
-                    "embeds": [
-                        {
-                            "title": "Lost subscribers!",
-                            "description": f"{self.__old_subs:,} (-{self.__old_subs-subs})\n**Subscribers:** `{subs:,}`",
-                            "color": 0xE67E22,
-                            "thumbnail": {"url": self.pfp},
-                            "footer": {"text": f"Account: {self.thread.name}"}
-                        }
-                    ]
-                }
+                payload["embeds"][0]["title"] = "Lost subscribers!"
+                payload["embeds"][0]["description"] = f"{self.__old_subs:,} (-{self.__old_subs-subs})\n**Subscribers:** `{subs:,}`"
                 for url in self.webhooks:
                     r = requests.post(url, json=payload, timeout=3)
                     if not r.ok:
