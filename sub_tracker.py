@@ -1,7 +1,7 @@
 import os, requests, threading
 from recnetlogin import login_to_recnet
 from time import sleep
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Union
 
 class SubTracker:
     thread: threading.Thread
@@ -78,7 +78,7 @@ class SubTracker:
         print(f"[{self.thread.name}] Loop broken out of")
 
 
-def fetch_subscribers(token: str, account_id: int) -> Dict[str, bool] | Dict[str, Any]:
+def fetch_subscribers(token: str, account_id: int) -> Union[Dict[str, bool], Dict[str, Any]]:
     """Fetch subscriber count from the rec.net servers."""
     # Send GET request to request sub count.
     r = requests.get(
