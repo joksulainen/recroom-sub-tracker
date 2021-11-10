@@ -45,8 +45,7 @@ class SubTracker:
                 "embeds": [
                     {
                         "color": 0xE67E22,
-                        "thumbnail": {"url": self.pfp},
-                        "footer": {"text": f"Account: {self.thread.name}"}
+                        "footer": {"text": f"**Account:** {self.thread.name}", "icon_url": self.pfp}
                     }
                 ]
             }
