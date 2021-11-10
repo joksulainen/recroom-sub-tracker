@@ -42,8 +42,7 @@ def main():
         if not r.ok:
             print("Account does not exist. Try again.")
             continue
-        result = r.json()
-        account_id = result["accountId"]
+        account_id = r.json()["accountId"]
 
     # Get webhooks from environment variable.
     webhooks = os.environ['RR_WEBHOOKS'].split(";")
