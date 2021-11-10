@@ -35,7 +35,7 @@ class SubTracker:
                 if not login.success:
                     print(f"[{self.thread.name}] Invalid RR login details")
                     break
-                self.token = login['bearer_token']
+                self.token = login.access_token
                 continue
 
             subs = sub_fetch['subs']
