@@ -1,9 +1,7 @@
-import json, os, platform, sys, requests, threading
+import json, os, platform, sys, requests
 from recnetlogin import login_to_recnet
-from keep_alive import keep_alive
-from time import sleep
-from typing import List
 from sub_tracker import SubTracker
+from keep_alive import keep_alive
 
 def main():
     """Main script function."""
