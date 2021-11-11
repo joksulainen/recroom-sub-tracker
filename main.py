@@ -31,6 +31,10 @@ def main():
     if not login.success:
         sys.exit("Incorrect RR account credentials!")
 
+    # Get webhooks from environment variable.
+    webhooks = os.environ['RR_WEBHOOKS'].split(";")
+    print("Webhooks:", len(webhooks))
+
     #Select account to track
     account_id = None
     while not account_id:
@@ -43,13 +47,6 @@ def main():
             print("Account does not exist. Try again.")
             continue
         account_id = r.json()["accountId"]
-
-    # Get webhooks from environment variable.
-    webhooks = os.environ['RR_WEBHOOKS'].split(";")
-    print("Webhooks:", len(webhooks))
-    for i in range(len(webhooks)):
-        print(f"[{i}]{webhooks[i]}")
-    print("-------------------")
 
     # Create SubTracker instance and start its thread.
     sub_tracker = SubTracker(login.access_token, account_id, webhooks, cfg["update_frequency"])
