@@ -18,12 +18,12 @@ def main():
             cfg = json.load(file)
 
     # Check existence of environment variables.
-    if ("RR_USERNAME" or "RR_PASSWORD" or "RR_WEBHOOKS") not in os.environ:
+    if ("RR_USERNAME" or "RR_PASSWORD" or "RR_WEBHOOK") not in os.environ:
         sys.exit(
             "Environment variables missing!\n"
             +f"'RR_USERNAME' present: {'RR_USERNAME' in os.environ}\n"
             +f"'RR_PASSWORD' present: {'RR_PASSWORD' in os.environ}\n"
-            +f"'RR_WEBHOOKS' present: {'RR_WEBHOOKS' in os.environ}"
+            +f"'RR_WEBHOOK' present: {'RR_WEBHOOK' in os.environ}"
         )
     
     # Login to rec.net.
@@ -32,8 +32,7 @@ def main():
         sys.exit("Incorrect RR account credentials!")
 
     # Get webhooks from environment variable.
-    webhooks = os.environ['RR_WEBHOOKS'].split(";")
-    print("Webhooks:", len(webhooks))
+    webhook = os.environ['RR_WEBHOOK']
 
     #Select account to track
     account_id = None
@@ -49,7 +48,7 @@ def main():
         account_id = r.json()["accountId"]
 
     # Create SubTracker instance and start its thread.
-    sub_tracker = SubTracker(login.access_token, account_id, webhooks, cfg["update_frequency"])
+    sub_tracker = SubTracker(login.access_token, account_id, webhook, cfg["update_frequency"])
     sub_tracker.thread.start()
 
     keep_alive()
