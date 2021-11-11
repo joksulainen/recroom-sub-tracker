@@ -18,8 +18,9 @@ class SubTracker:
         self.update_frequency = update_frequency
         self.webhooks = webhooks
         r = requests.get(f"https://accounts.rec.net/account/{self.account_id}")
-        self.thread = threading.Thread(target=self.__sub_tracker, name=r.json()['username'])
-        self.pfp = "https://img.rec.net/" + r.json()["profileImage"]
+        r_json = r.json()
+        self.thread = threading.Thread(target=self.__sub_tracker, name="@"+r_json['username'])
+        self.pfp = "https://img.rec.net/" + r_json["profileImage"]
         self.__old_subs = fetch_subscribers(self.token, self.account_id)['subs']
 
 
@@ -46,7 +47,7 @@ class SubTracker:
                     {
                         "color": 0xE67E22,
                         "thumbnail": {"url": self.pfp},
-                        "footer": {"text": f"Account: {self.thread.name}"}
+                        "footer": {"text": f"Account: @{self.thread.name}"}
                     }
                 ]
             }
