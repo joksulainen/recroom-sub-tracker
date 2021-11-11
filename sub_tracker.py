@@ -31,7 +31,7 @@ class SubTracker:
             # Login if the fetch attempt was unsuccessful.
             if not sub_fetch['success']:
                 login = login_to_recnet(os.environ["RR_USERNAME"], os.environ["RR_PASSWORD"])
-                # Exit process if login failed. Otherwise set new token and continue.
+                # Break loop if login failed. Otherwise set new token and continue.
                 if not login.success:
                     print(f"[{self.thread.name}] Invalid RR login details")
                     break
