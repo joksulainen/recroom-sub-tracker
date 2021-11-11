@@ -9,14 +9,14 @@ class SubTracker:
     account_id: int
     pfp: str
     update_frequency: float
-    webhooks: List[str]
+    webhook: str
     __old_subs: int
 
-    def __init__(self, token: str, account_id: int, webhooks: List[str], update_frequency: float = 3) -> None:
+    def __init__(self, token: str, account_id: int, webhook: str, update_frequency: float = 3) -> None:
         self.account_id = account_id
         self.token = token
         self.update_frequency = update_frequency
-        self.webhooks = webhooks
+        self.webhook = webhook
         r = requests.get(f"https://accounts.rec.net/account/{self.account_id}")
         r_json = r.json()
         self.thread = threading.Thread(target=self.__sub_tracker, name="@"+r_json['username'])
@@ -55,19 +55,17 @@ class SubTracker:
                 print(f"[{self.thread.name}] Gained subs!", subs-self.__old_subs)
                 payload["embeds"][0]["title"] = "Gained subscribers!"
                 payload["embeds"][0]["description"] = f"{self.__old_subs:,} (+{(subs-self.__old_subs):,})\n**Subscribers:** `{subs:,}`"
-                for i in range(len(self.webhooks)):
-                    r = requests.post(self.webhooks[i], json=payload, timeout=3)
-                    if not r.ok:
-                        print(f"[{self.thread.name}] POST request failed ({i})")
+                r = requests.post(self.webhook, json=payload, timeout=3)
+                if not r.ok:
+                    print(f"[{self.thread.name}] POST request failed")
                 self.__old_subs = subs
             elif subs < self.__old_subs:
                 print(f"[{self.thread.name}] Lost subs!", self.__old_subs-subs)
                 payload["embeds"][0]["title"] = "Lost subscribers!"
                 payload["embeds"][0]["description"] = f"{self.__old_subs:,} (-{(self.__old_subs-subs):,})\n**Subscribers:** `{subs:,}`"
-                for i in range(len(self.webhooks)):
-                    r = requests.post(self.webhooks[i], json=payload, timeout=3)
-                    if not r.ok:
-                        print(f"[{self.thread.name}] POST request failed ({i})")
+                r = requests.post(self.webhook, json=payload, timeout=3)
+                if not r.ok:
+                    print(f"[{self.thread.name}] POST request failed")
                 self.__old_subs = subs
             else:
                 print(f"[{self.thread.name}] No sub change.")
