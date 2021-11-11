@@ -47,7 +47,7 @@ class SubTracker:
                     {
                         "color": 0xE67E22,
                         "thumbnail": {"url": self.pfp},
-                        "footer": {"text": f"Account: @{self.thread.name}"}
+                        "footer": {"text": f"Account: {self.thread.name}"}
                     }
                 ]
             }
