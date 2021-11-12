@@ -1,7 +1,7 @@
 import json, platform, sys, os, requests, threading
 from recnetlogin import login_to_recnet
 from time import sleep
-from typing import List, Dict, Any, Union
+from typing import Dict, Any, Union
 
 class SubTracker:
     thread: threading.Thread
