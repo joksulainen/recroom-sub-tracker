@@ -68,12 +68,13 @@ class RoomTracker:
                             "fields": [
                                 {
                                     "name": "Visits",
-                                    "value": f"{self.__old_visits:,} (+{(visits-self.__old_visits):,})\n**Total:** `{visits:,}`"
+                                    "value": f"{self.__old_visits:,} (+{(visits-self.__old_visits):,})\n**Total:** `{visits:,}`",
+                                    "inline": True
                                 },
                                 {
                                     "name": "Visitors",
-                                    "value": f"{self.__old_visitors:,}"+f" (+{(visitors-self.__old_visitors):,})" if visitors > self.__old_visitors else ""\
-                                        f"\n**Total:** `{visitors:,}`"
+                                    "value": f"{self.__old_visitors:,} (+{(visitors-self.__old_visitors):,})\n**Total:** `{visitors:,}`",
+                                    "inline": True
                                 },
                             ],
                             "color": 0xE67E22,
@@ -115,7 +116,8 @@ class RoomTracker:
 
                 payload["embeds"][0]["fields"].append({
                     "name": "Cheers",
-                    "value": f"{self.__old_cheers:,}{_middle_part}\n**Total:** `{cheers:,}`"
+                    "value": f"{self.__old_cheers:,}{_middle_part}\n**Total:** `{cheers:,}`",
+                    "inline": True
                 })
 
                 # Favorites
@@ -128,7 +130,8 @@ class RoomTracker:
 
                 payload["embeds"][0]["fields"].append({
                     "name": "Favorites",
-                    "value": f"{self.__old_favs:,}{_middle_part}\n**Total:** `{favs:,}`"
+                    "value": f"{self.__old_favs:,}{_middle_part}\n**Total:** `{favs:,}`",
+                    "inline": True
                 })
 
                 r = requests.post(self.webhook, json=payload, timeout=self.REQUEST_TIMEOUT)
