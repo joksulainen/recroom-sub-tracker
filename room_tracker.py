@@ -58,7 +58,7 @@ class RoomTracker:
             cheers = room_fetch['stats']['CheerCount']
             favs = room_fetch['stats']['FavoriteCount']
 
-            # Post embed of new stats if applicable.
+            # Post embed of new visits if applicable.
             if visits > self.__old_visits:
                 print(f"[{self.thread.name}] New visits! {visits-self.__old_visits}|{visitors-self.__old_visitors}")
                 payload = {
