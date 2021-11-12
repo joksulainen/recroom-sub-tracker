@@ -99,7 +99,7 @@ def main():
     print(f"Running on: {platform.system()} {platform.release()} ({os.name})")
     print("-------------------")
 
-    # Initialize configuration.
+    # Initialize configuration if it exists.
     if os.path.isfile("config.json"):
         with open("config.json") as file:
             cfg = json.load(file)

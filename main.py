@@ -10,10 +10,8 @@ def main():
     print(f"Running on: {platform.system()} {platform.release()} ({os.name})")
     print("-------------------")
 
-    # Initialize configuration.
-    if not os.path.isfile("config.json"):
-        sys.exit("'config.json' not found! Please add it and try again.")
-    else:
+    # Initialize configuration if it exists.
+    if os.path.isfile("config.json"):
         with open("config.json") as file:
             cfg = json.load(file)
 
@@ -48,7 +46,7 @@ def main():
         account_id = r.json()["accountId"]
 
     # Create SubTracker instance and start its thread.
-    sub_tracker = SubTracker(login.access_token, account_id, webhook, cfg["update_frequency"])
+    sub_tracker = SubTracker(login.access_token, account_id, webhook, cfg["update_frequency"] if cfg else 3)
     sub_tracker.thread.start()
 
     keep_alive()
