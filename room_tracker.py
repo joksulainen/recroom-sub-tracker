@@ -14,15 +14,17 @@ class RoomTracker:
     __old_cheers: int
     __old_favs: int
 
+    REQUEST_TIMEOUT = 3
+
     def __init__(self, room_id: int, webhook: str, update_frequency: float = 10) -> None:
         self.room_id = room_id
         self.update_frequency = update_frequency
         self.webhook = webhook
-        r = requests.get(f"https://rooms.rec.net/rooms/{self.room_id}")
+        r = requests.get(f"https://rooms.rec.net/rooms/{self.room_id}", timeout=self.REQUEST_TIMEOUT)
         r_json = r.json()
         self.thread = threading.Thread(target=self.__room_tracker, name="^"+r_json['Name'])
         self.image = "https://img.rec.net/" + r_json["ImageName"]
-        room_stats = fetch_room_stats(self.room_id)
+        room_stats = fetch_room_stats(self.room_id, self.REQUEST_TIMEOUT)
         self.__old_visits = room_stats['stats']['VisitCount']
         self.__old_visitors = room_stats['stats']['VisitorCount']
         self.__old_cheers = room_stats['stats']['CheerCount']
@@ -80,7 +82,7 @@ class RoomTracker:
                         }
                     ]
                 }
-                r = requests.post(self.webhook, json=payload, timeout=3)
+                r = requests.post(self.webhook, json=payload, timeout=self.REQUEST_TIMEOUT)
                 if not r.ok:
                     print(f"[{self.thread.name}] POST request failed")
                 self.__old_visits = visits
@@ -95,10 +97,10 @@ class RoomTracker:
         print(f"[{self.thread.name}] Loop broken out of")
 
 
-def fetch_room_stats(room_id: int) -> Union[Dict[str, bool], Dict[str, Any]]:
+def fetch_room_stats(room_id: int, timeout: float = 3) -> Union[Dict[str, bool], Dict[str, Any]]:
     """Fetch subscriber count from the rec.net servers."""
     # Send GET request to request room.
-    r = requests.get(f"https://rooms.rec.net/rooms/{room_id}")
+    r = requests.get(f"https://rooms.rec.net/rooms/{room_id}", timeout=timeout)
     # Return a failed fetch attempt.
     if not r.ok:
         return {"success": False}

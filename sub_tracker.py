@@ -13,16 +13,18 @@ class SubTracker:
     webhook: str
     __old_subs: int
 
+    REQUEST_TIMEOUT = 3
+
     def __init__(self, token: str, account_id: int, webhook: str, update_frequency: float = 3) -> None:
         self.account_id = account_id
         self.token = token
         self.update_frequency = update_frequency
         self.webhook = webhook
-        r = requests.get(f"https://accounts.rec.net/account/{self.account_id}")
+        r = requests.get(f"https://accounts.rec.net/account/{self.account_id}", timeout=self.REQUEST_TIMEOUT)
         r_json = r.json()
         self.thread = threading.Thread(target=self.__sub_tracker, name="@"+r_json['username'])
         self.pfp = "https://img.rec.net/" + r_json["profileImage"]
-        self.__old_subs = fetch_subscribers(self.token, self.account_id)['subs']
+        self.__old_subs = fetch_subscribers(self.token, self.account_id, self.REQUEST_TIMEOUT)['subs']
 
 
     # Functions to start and stop tracker.
@@ -41,7 +43,7 @@ class SubTracker:
         """Sub tracker loop."""
         while True:
             # Fetch sub count.
-            sub_fetch = fetch_subscribers(self.token, self.account_id)
+            sub_fetch = fetch_subscribers(self.token, self.account_id, self.REQUEST_TIMEOUT)
             # Login if the fetch attempt was unsuccessful.
             if not sub_fetch['success']:
                 login = login_to_recnet(os.environ["RR_USERNAME"], os.environ["RR_PASSWORD"])
@@ -68,7 +70,7 @@ class SubTracker:
                 print(f"[{self.thread.name}] Gained subs!", subs-self.__old_subs)
                 payload["embeds"][0]["title"] = "Gained subscribers!"
                 payload["embeds"][0]["description"] = f"{self.__old_subs:,} (+{(subs-self.__old_subs):,})\n**Subscribers:** `{subs:,}`"
-                r = requests.post(self.webhook, json=payload, timeout=3)
+                r = requests.post(self.webhook, json=payload, timeout=self.REQUEST_TIMEOUT)
                 if not r.ok:
                     print(f"[{self.thread.name}] POST request failed")
                 self.__old_subs = subs
@@ -76,7 +78,7 @@ class SubTracker:
                 print(f"[{self.thread.name}] Lost subs!", self.__old_subs-subs)
                 payload["embeds"][0]["title"] = "Lost subscribers!"
                 payload["embeds"][0]["description"] = f"{self.__old_subs:,} (-{(self.__old_subs-subs):,})\n**Subscribers:** `{subs:,}`"
-                r = requests.post(self.webhook, json=payload, timeout=3)
+                r = requests.post(self.webhook, json=payload, timeout=self.REQUEST_TIMEOUT)
                 if not r.ok:
                     print(f"[{self.thread.name}] POST request failed")
                 self.__old_subs = subs
@@ -90,12 +92,12 @@ class SubTracker:
         print(f"[{self.thread.name}] Loop broken out of")
 
 
-def fetch_subscribers(token: str, account_id: int) -> Union[Dict[str, bool], Dict[str, Any]]:
+def fetch_subscribers(token: str, account_id: int, timeout: float = 3) -> Union[Dict[str, bool], Dict[str, Any]]:
     """Fetch subscriber count from the rec.net servers."""
     # Send GET request to request sub count.
     r = requests.get(
         f"https://clubs.rec.net/subscription/subscriberCount/{account_id}",
-        headers={"Authorization": token}
+        headers={"Authorization": token}, timeout=timeout
     )
     # Return a failed fetch attempt.
     if not r.ok:
