@@ -21,7 +21,7 @@ class VisitTracker:
         r_json = r.json()
         self.thread = threading.Thread(target=self.__room_tracker, name="^"+r_json['Name'])
         self.image = "https://img.rec.net/" + r_json["ImageName"]
-        room_stats = fetch_room(self.room_id)
+        room_stats = fetch_room_stats(self.room_id)
         self.__old_visits = room_stats['stats']['VisitCount']
         self.__old_visitors = room_stats['stats']['VisitorCount']
         self.__old_cheers = room_stats['stats']['CheerCount']
@@ -32,7 +32,7 @@ class VisitTracker:
         """Room tracker loop."""
         while True:
             # Fetch visit count.
-            room_fetch = fetch_room(self.room_id)
+            room_fetch = fetch_room_stats(self.room_id)
             # Login if the fetch attempt was unsuccessful.
             if not room_fetch['success']:
                 print(f"[{self.thread.name}] Room ID is invalid!")
@@ -92,7 +92,7 @@ class VisitTracker:
         print(f"[{self.thread.name}] Loop broken out of")
 
 
-def fetch_room(room_id: int) -> Union[Dict[str, bool], Dict[str, Any]]:
+def fetch_room_stats(room_id: int) -> Union[Dict[str, bool], Dict[str, Any]]:
     """Fetch subscriber count from the rec.net servers."""
     # Send GET request to request room.
     r = requests.get(f"https://rooms.rec.net/rooms/{room_id}")
@@ -100,7 +100,7 @@ def fetch_room(room_id: int) -> Union[Dict[str, bool], Dict[str, Any]]:
     if not r.ok:
         return {"success": False}
 
-    # Return success with room stats and owner id.
+    # Return success with room stats.
     return {"success": True, "stats": r.json()['Stats']}
 
 
