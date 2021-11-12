@@ -147,7 +147,7 @@ class RoomTracker:
 
 
 def fetch_room_stats(room_id: int, timeout: float = 3) -> Union[Dict[str, bool], Dict[str, Any]]:
-    """Fetch subscriber count from the rec.net servers."""
+    """Fetch room stats from the rec.net servers."""
     # Send GET request to request room.
     r = requests.get(f"https://rooms.rec.net/rooms/{room_id}", timeout=timeout)
     # Return a failed fetch attempt.
