@@ -4,6 +4,7 @@ from typing import Dict, Any, Union
 
 class RoomTracker:
     thread: threading.Thread
+    is_running: bool = False
     room_id: int
     image: str
     update_frequency: float
@@ -28,6 +29,18 @@ class RoomTracker:
         self.__old_favs = room_stats['stats']['FavoriteCount']
 
 
+    # Functions to start and stop tracker.
+    # Currently does nothing meaningful.
+    def start(self) -> None:
+        """Start tracker."""
+        self.is_running = True
+        self.thread.start()
+
+    def stop(self) -> None:
+        """Stop tracker."""
+        self.is_running = False
+
+
     def __room_tracker(self) -> None:
         """Room tracker loop."""
         while True:
@@ -44,13 +57,12 @@ class RoomTracker:
             favs = room_fetch['stats']['FavoriteCount']
 
             # Post embed of new stats if applicable.
-            if (visits > self.__old_visits or visitors > self.__old_visitors or 
-                cheers > self.__old_cheers or favs > self.__old_favs):
-                print(f"[{self.thread.name}] Room stats updated!")
+            if visits > self.__old_visits:
+                print(f"[{self.thread.name}] New visits! Visits: {visits}|Visitors: {visitors}")
                 payload = {
                     "embeds": [
                         {
-                            "title": "Room stats updated!",
+                            "title": "New visits!",
                             "fields": [
                                 {
                                     "name": "Visits",
@@ -58,16 +70,9 @@ class RoomTracker:
                                 },
                                 {
                                     "name": "Visitors",
-                                    "value": f"{self.__old_visitors:,} (+{(visitors-self.__old_visitors):,})\n**Total:** `{visitors:,}`"
+                                    "value": f"{self.__old_visitors:,}"+f" (+{(visitors-self.__old_visitors):,})" if visitors > self.__old_visitors else ""\
+                                        f"\n**Total:** `{visitors:,}`"
                                 },
-                                {
-                                    "name": "Cheers",
-                                    "value": f"{self.__old_cheers:,} (+{(cheers-self.__old_cheers):,})\n**Total:** `{cheers:,}`"
-                                },
-                                {
-                                    "name": "Favorites",
-                                    "value": f"{self.__old_favs:,} (+{(favs-self.__old_favs):,})\n**Total:** `{favs:,}`"
-                                }
                             ],
                             "color": 0xE67E22,
                             "thumbnail": {"url": self.image},
@@ -80,10 +85,8 @@ class RoomTracker:
                     print(f"[{self.thread.name}] POST request failed")
                 self.__old_visits = visits
                 self.__old_visitors = visitors
-                self.__old_cheers = cheers
-                self.__old_favs = favs
             else:
-                print(f"[{self.thread.name}] No new room stats.")
+                print(f"[{self.thread.name}] No new visits.")
             
             # Wait the given time before checking again.
             sleep(self.update_frequency)
