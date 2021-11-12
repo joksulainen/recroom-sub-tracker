@@ -5,6 +5,7 @@ from typing import Dict, Any, Union
 
 class SubTracker:
     thread: threading.Thread
+    is_running: bool = False
     token: str
     account_id: int
     pfp: str
@@ -22,6 +23,18 @@ class SubTracker:
         self.thread = threading.Thread(target=self.__sub_tracker, name="@"+r_json['username'])
         self.pfp = "https://img.rec.net/" + r_json["profileImage"]
         self.__old_subs = fetch_subscribers(self.token, self.account_id)['subs']
+
+
+    # Functions to start and stop tracker.
+    # Currently does nothing meaningful.
+    def start(self) -> None:
+        """Start tracker."""
+        self.is_running = True
+        self.thread.start()
+
+    def stop(self) -> None:
+        """Stop tracker."""
+        self.is_running = False
 
 
     def __sub_tracker(self) -> None:
