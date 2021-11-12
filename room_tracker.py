@@ -73,8 +73,8 @@ class RoomTracker:
                                 },
                                 {
                                     "name": "Visitors",
-                                    "value": f"{self.__old_visitors:,} %s\n**Total:** `{visitors:,}`"
-                                        %(f"(+{visitors-self.__old_visitors})" if visitors>self.__old_visitors else ""),
+                                    "value": f"{self.__old_visitors:,}%s\n**Total:** `{visitors:,}`"
+                                        %(f" (+{visitors-self.__old_visitors})" if visitors > self.__old_visitors else ""),
                                     "inline": True
                                 },
                             ],
