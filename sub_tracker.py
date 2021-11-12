@@ -41,7 +41,7 @@ class SubTracker:
 
             subs = sub_fetch['subs']
 
-            # Post embeds of sub increase or decrease if applicable.
+            # Post embed of sub increase or decrease if applicable.
             payload = {
                 "embeds": [
                     {
