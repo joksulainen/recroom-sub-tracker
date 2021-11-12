@@ -2,7 +2,7 @@ import json, platform, os, requests, threading
 from time import sleep
 from typing import Dict, Any, Union
 
-class VisitTracker:
+class RoomTracker:
     thread: threading.Thread
     room_id: int
     image: str
@@ -127,15 +127,15 @@ def main():
     # Select room to track.
     room_id = None
     while not room_id:
-        room_name_input = input("Room name to track visits of: ")
+        room_name_input = input("Room name to track stats of: ")
         r = requests.get(f"https://rooms.rec.net/rooms?name={room_name_input}")
         if not r.ok:
             print("Room does not exist. Try again.")
             continue
         room_id = r.json()["RoomId"]
 
-    # Create VisitTracker instance and start its thread.
-    tracker = VisitTracker(room_id, webhook, cfg['update_frequency'] if cfg else 10)
+    # Create RoomTracker instance and start its thread.
+    tracker = RoomTracker(room_id, webhook, cfg['update_frequency'] if cfg else 10)
     tracker.thread.start()
 
 if __name__ == "__main__":
