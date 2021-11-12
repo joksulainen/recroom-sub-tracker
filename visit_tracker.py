@@ -1,4 +1,4 @@
-import json, platform, sys, os, requests, threading
+import json, platform, os, requests, threading
 from time import sleep
 from typing import Dict, Any, Union
 
