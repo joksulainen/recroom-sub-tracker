@@ -60,7 +60,7 @@ class RoomTracker:
 
             # Post embed of new stats if applicable.
             if visits > self.__old_visits:
-                print(f"[{self.thread.name}] New visits! Visits: {visits}|Visitors: {visitors}")
+                print(f"[{self.thread.name}] New visits! {visits-self.__old_visits}|{visitors-self.__old_visitors}")
                 payload = {
                     "embeds": [
                         {
