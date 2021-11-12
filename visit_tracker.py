@@ -1,6 +1,6 @@
 import json, platform, sys, os, requests, threading
 from time import sleep
-from typing import List, Dict, Any, Union
+from typing import Dict, Any, Union
 
 class VisitTracker:
     thread: threading.Thread
@@ -9,6 +9,9 @@ class VisitTracker:
     update_frequency: float
     webhook: str
     __old_visits: int
+    __old_visitors: int
+    __old_cheers: int
+    __old_favs: int
 
     def __init__(self, room_id: int, webhook: str, update_frequency: float = 10) -> None:
         self.room_id = room_id
@@ -20,6 +23,9 @@ class VisitTracker:
         self.image = "https://img.rec.net/" + r_json["ImageName"]
         room_stats = fetch_room(self.room_id)
         self.__old_visits = room_stats['stats']['VisitCount']
+        self.__old_visitors = room_stats['stats']['VisitorCount']
+        self.__old_cheers = room_stats['stats']['CheerCount']
+        self.__old_favs = room_stats['stats']['FavoriteCount']
 
 
     def __room_tracker(self) -> None:
@@ -33,15 +39,35 @@ class VisitTracker:
                 break
 
             visits = room_fetch['stats']['VisitCount']
+            visitors = room_fetch['stats']['VisitorCount']
+            cheers = room_fetch['stats']['CheerCount']
+            favs = room_fetch['stats']['FavoriteCount']
 
-            # Post embeds of sub increase or decrease if applicable.
-            if visits > self.__old_visits:
-                print(f"[{self.thread.name}] Gained visits!", visits-self.__old_visits)
+            # Post embed of new stats if applicable.
+            if (visits>self.__old_visits)or(visitors>self.__old_visitors)or(cheers>self.__old_cheers)or(favs>self.__old_favs):
+                print(f"[{self.thread.name}] Room stats updated!")
                 payload = {
                     "embeds": [
                         {
-                            "title": "Gained visits!",
-                            "description": f"{self.__old_visits:,} (+{(visits-self.__old_visits):,})\n**Visits:** `{visits:,}`",
+                            "title": "Room stats updated!",
+                            "fields": [
+                                {
+                                    "name": "Visits",
+                                    "value": f"{self.__old_visits:,} (+{(visits-self.__old_visits):,})\n**Total:** `{visits:,}`"
+                                },
+                                {
+                                    "name": "Visitors",
+                                    "value": f"{self.__old_visitors:,} (+{(visitors-self.__old_visitors):,})\n**Total:** `{visitors:,}`"
+                                },
+                                {
+                                    "name": "Cheers",
+                                    "value": f"{self.__old_cheers:,} (+{(cheers-self.__old_cheers):,})\n**Total:** `{cheers:,}`"
+                                },
+                                {
+                                    "name": "Favorites",
+                                    "value": f"{self.__old_favs:,} (+{(favs-self.__old_favs):,})\n**Total:** `{favs:,}`"
+                                }
+                            ],
                             "color": 0xE67E22,
                             "thumbnail": {"url": self.image},
                             "footer": {"text": f"Room: {self.thread.name}"}
@@ -52,8 +78,11 @@ class VisitTracker:
                 if not r.ok:
                     print(f"[{self.thread.name}] POST request failed")
                 self.__old_visits = visits
+                self.__old_visitors = visitors
+                self.__old_cheers = cheers
+                self.__old_favs = favs
             else:
-                print(f"[{self.thread.name}] No new visits.")
+                print(f"[{self.thread.name}] No new room stats.")
             
             # Wait the given time before checking again.
             sleep(self.update_frequency)
