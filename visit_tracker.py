@@ -91,7 +91,7 @@ def main():
         # If any of the above are missing, request user input to acquire them.
         webhook = input("Webhook URL to POST to: ")
     else:
-    # Get webhooks from environment variable.
+        # Get webhook from environment variable.
         webhook = os.environ['RR_WEBHOOK']
 
     # Select room to track.

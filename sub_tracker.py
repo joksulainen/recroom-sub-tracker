@@ -107,10 +107,10 @@ def main():
     # Check existence of environment variables.
     if ("RR_USERNAME" or "RR_PASSWORD" or "RR_WEBHOOK") not in os.environ:
         sys.exit(
-            "Environment variables missing!\n"
-            +f"'RR_USERNAME' present: {'RR_USERNAME' in os.environ}\n"
-            +f"'RR_PASSWORD' present: {'RR_PASSWORD' in os.environ}\n"
-            +f"'RR_WEBHOOK' present: {'RR_WEBHOOK' in os.environ}"
+            "Environment variables missing!\n" \
+            f"'RR_USERNAME' present: {'RR_USERNAME' in os.environ}\n" \
+            f"'RR_PASSWORD' present: {'RR_PASSWORD' in os.environ}\n" \
+            f"'RR_WEBHOOK' present: {'RR_WEBHOOK' in os.environ}"
         )
     
     # Login to rec.net.
@@ -118,7 +118,7 @@ def main():
     if not login.success:
         sys.exit("Incorrect RR account credentials!")
 
-    # Get webhooks from environment variable.
+    # Get webhook from environment variable.
     webhook = os.environ['RR_WEBHOOK']
 
     # Select account to track.
