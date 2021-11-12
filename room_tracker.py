@@ -89,6 +89,55 @@ class RoomTracker:
                 self.__old_visitors = visitors
             else:
                 print(f"[{self.thread.name}] No new visits.")
+            # Post embed of room stats if applicable.
+            if cheers != self.__old_cheers or favs != self.__old_favs:
+                print(f"[{self.thread.name}] New room stats! {cheers-self.__old_cheers}|{favs-self.__old_favs}")
+                payload = {
+                    "embeds": [
+                        {
+                            "title": "New room stats!",
+                            "fields": [],
+                            "color": 0xE67E22,
+                            "thumbnail": {"url": self.image},
+                            "footer": {"text": f"Room: {self.thread.name}"}
+                        }
+                    ]
+                }
+
+                # Cheers
+                _middle_part: str
+                if cheers > self.__old_cheers:
+                    _middle_part = f" (+{(cheers-self.__old_cheers):,})"
+                elif cheers < self.__old_cheers:
+                    _middle_part = f" (-{(self.__old_cheers-cheers):,})"
+                else:
+                    _middle_part = ""
+
+                payload["embeds"][0]["fields"].append({
+                    "name": "Cheers",
+                    "value": f"{self.__old_cheers:,}{_middle_part}\n**Total:** `{cheers:,}`"
+                })
+
+                # Favorites
+                if favs > self.__old_favs:
+                    _middle_part = f" (+{(favs-self.__old_favs):,})"
+                elif favs < self.__old_favs:
+                    _middle_part = f" (+{(self.__old_favs-favs):,})"
+                else:
+                    _middle_part = ""
+
+                payload["embeds"][0]["fields"].append({
+                    "name": "Favorites",
+                    "value": f"{self.__old_favs:,}{_middle_part}\n**Total:** `{favs:,}`"
+                })
+
+                r = requests.post(self.webhook, json=payload, timeout=self.REQUEST_TIMEOUT)
+                if not r.ok:
+                    print(f"[{self.thread.name}] POST request failed")
+                self.__old_cheers = cheers
+                self.__old_favs = favs
+            else:
+                print(f"[{self.thread.name}] No new room stats.")
             
             # Wait the given time before checking again.
             sleep(self.update_frequency)
