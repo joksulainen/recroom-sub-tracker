@@ -44,7 +44,8 @@ class VisitTracker:
             favs = room_fetch['stats']['FavoriteCount']
 
             # Post embed of new stats if applicable.
-            if (visits>self.__old_visits)or(visitors>self.__old_visitors)or(cheers>self.__old_cheers)or(favs>self.__old_favs):
+            if (visits > self.__old_visits or visitors > self.__old_visitors or 
+                cheers > self.__old_cheers or favs > self.__old_favs):
                 print(f"[{self.thread.name}] Room stats updated!")
                 payload = {
                     "embeds": [
