@@ -33,7 +33,7 @@ class VisitTracker:
         while True:
             # Fetch visit count.
             room_fetch = fetch_room_stats(self.room_id)
-            # Login if the fetch attempt was unsuccessful.
+            # Break out of loop if the fetch attempt was unsuccessful.
             if not room_fetch['success']:
                 print(f"[{self.thread.name}] Room ID is invalid!")
                 break
