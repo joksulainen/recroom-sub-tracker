@@ -46,7 +46,7 @@ def main():
         account_id = r.json()["accountId"]
 
     # Create SubTracker instance and start its thread.
-    sub_tracker = SubTracker(login.access_token, account_id, webhook, cfg["update_frequency"] if cfg else 3)
+    sub_tracker = SubTracker(account_id, webhook, cfg["update_frequency"] if cfg else 3)
     sub_tracker.thread.start()
 
     keep_alive()

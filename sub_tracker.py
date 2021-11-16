@@ -1,12 +1,10 @@
 import json, platform, sys, os, requests, threading
-from recnetlogin import login_to_recnet
 from time import sleep
 from typing import Dict, Any, Union
 
 class SubTracker:
     thread: threading.Thread
     is_running: bool = False
-    token: str
     account_id: int
     pfp: str
     update_frequency: float
@@ -15,9 +13,8 @@ class SubTracker:
 
     REQUEST_TIMEOUT = 3
 
-    def __init__(self, token: str, account_id: int, webhook: str, update_frequency: float = 3) -> None:
+    def __init__(self, account_id: int, webhook: str, update_frequency: float = 3) -> None:
         self.account_id = account_id
-        self.token = token
         self.update_frequency = update_frequency
         self.webhook = webhook
         r = requests.get(f"https://accounts.rec.net/account/{self.account_id}", timeout=self.REQUEST_TIMEOUT)
@@ -43,16 +40,11 @@ class SubTracker:
         """Sub tracker loop."""
         while True:
             # Fetch sub count.
-            sub_fetch = fetch_subscribers(self.token, self.account_id, self.REQUEST_TIMEOUT)
+            sub_fetch = fetch_subscribers(self.account_id, self.REQUEST_TIMEOUT)
             # Login if the fetch attempt was unsuccessful.
             if not sub_fetch['success']:
-                login = login_to_recnet(os.environ["RR_USERNAME"], os.environ["RR_PASSWORD"])
-                # Break loop if login failed. Otherwise set new token and continue.
-                if not login.success:
-                    print(f"[{self.thread.name}] Invalid RR login details!")
-                    break
-                self.token = login.access_token
-                continue
+                print(f"[{self.thread.name}] Username is invalid!")
+                break
 
             subs = sub_fetch['subs']
 
@@ -96,8 +88,7 @@ def fetch_subscribers(token: str, account_id: int, timeout: float = 3) -> Union[
     """Fetch subscriber count from the rec.net servers."""
     # Send GET request to request sub count.
     r = requests.get(
-        f"https://clubs.rec.net/subscription/subscriberCount/{account_id}",
-        headers={"Authorization": token}, timeout=timeout
+        f"https://clubs.rec.net/subscription/subscriberCount/{account_id}", timeout=timeout
     )
     # Return a failed fetch attempt.
     if not r.ok:
@@ -120,29 +111,24 @@ def main():
             cfg = json.load(file)
 
     # Check existence of environment variables.
-    if ("RR_USERNAME" or "RR_PASSWORD" or "RR_WEBHOOK") not in os.environ:
+    if "RR_WEBHOOK" not in os.environ:
         sys.exit(
             "Environment variables missing!\n" \
-            f"'RR_USERNAME' present: {'RR_USERNAME' in os.environ}\n" \
-            f"'RR_PASSWORD' present: {'RR_PASSWORD' in os.environ}\n" \
             f"'RR_WEBHOOK' present: {'RR_WEBHOOK' in os.environ}"
         )
-    
-    # Login to rec.net.
-    login = login_to_recnet(os.environ["RR_USERNAME"], os.environ["RR_PASSWORD"])
-    if not login.success:
-        sys.exit("Incorrect RR account credentials!")
 
-    # Get webhook from environment variable.
-    webhook = os.environ['RR_WEBHOOK']
+    # Check existence of environment variables.
+    if "RR_WEBHOOK" not in os.environ:
+        # If any of the above are missing, request user input to acquire them.
+        webhook = input("Webhook URL to POST to: ")
+    else:
+        # Get webhook from environment variable.
+        webhook = os.environ['RR_WEBHOOK']
 
     # Select account to track.
     account_id = None
     while not account_id:
-        username_input = input("Username of account to track subs of (Empty for using current login details): ")
-        if username_input == "":
-            account_id = login.data["accountId"]
-            break
+        username_input = input("Username of account to track subs of: ")
         r = requests.get(f"https://accounts.rec.net/account?username={username_input}")
         if not r.ok:
             print("Account does not exist. Try again.")
@@ -150,7 +136,7 @@ def main():
         account_id = r.json()["accountId"]
 
     # Create SubTracker instance and start its thread.
-    tracker = SubTracker(login.access_token, account_id, webhook, cfg["update_frequency"] if cfg else 3)
+    tracker = SubTracker(account_id, webhook, cfg["update_frequency"] if cfg else 3)
     tracker.thread.start()
 
 if __name__ == "__main__":
