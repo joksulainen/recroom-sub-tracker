@@ -21,7 +21,7 @@ class SubTracker:
         r_json = r.json()
         self.thread = threading.Thread(target=self.__sub_tracker, name="@"+r_json['username'])
         self.pfp = "https://img.rec.net/" + r_json["profileImage"]
-        self.__old_subs = fetch_subscribers(self.token, self.account_id, self.REQUEST_TIMEOUT)['subs']
+        self.__old_subs = fetch_subscribers(self.account_id, self.REQUEST_TIMEOUT)['subs']
 
 
     # Functions to start and stop tracker.
